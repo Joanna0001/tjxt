@@ -5,6 +5,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -12,7 +13,7 @@ import java.util.Set;
 @ConfigurationProperties(prefix = "tj.auth")
 public class AuthProperties implements InitializingBean {
 
-    private Set<String> excludePath;
+    private Set<String> excludePath = new HashSet<>();   // ① 关键：立即初始化
 
     @Override
     public void afterPropertiesSet() throws Exception {
