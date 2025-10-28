@@ -13,6 +13,7 @@ spring:
     nacos:
       config:
         file-extension: yaml
+        namespace: 830ebeac-0e0b-45bf-bea3-1ea3d02827c4
         shared-configs: # 共享配置
           - dataId: shared-spring.yaml # 共享spring配置
           - dataId: shared-redis.yaml # 共享redis配置

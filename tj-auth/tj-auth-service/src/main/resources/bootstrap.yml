@@ -10,6 +10,7 @@ spring:
   cloud:
     nacos:
       config:
+        namespace: 830ebeac-0e0b-45bf-bea3-1ea3d02827c4
         file-extension: yaml
         shared-configs: # 共享配置
           - data-id: shared-spring.yaml # 共享spring配置
