@@ -1,0 +1,225 @@
+version: '3.8'
+
+services:
+  # 认证服务
+  tj-auth-service:
+    image: ghcr.io/joanna0001/tj-auth-service:latest
+    container_name: tj-auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 网关服务
+  tj-gateway:
+    image: ghcr.io/joanna0001/tj-gateway:latest
+    container_name: tj-gateway
+    ports:
+      - "10010:10010"
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+    restart: always
+    networks:
+      - tjxt-network
+    depends_on:
+      - tj-auth-service
+
+  # 用户服务
+  tj-user:
+    image: ghcr.io/joanna0001/tj-user:latest
+    container_name: tj-user
+    ports:
+      - "8082:8082"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 课程服务
+  tj-course:
+    image: ghcr.io/joanna0001/tj-course:latest
+    container_name: tj-course
+    ports:
+      - "8086:8086"
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 考试服务
+  tj-exam:
+    image: ghcr.io/joanna0001/tj-exam:latest
+    container_name: tj-exam
+    ports:
+      - "8089:8089"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 数据服务
+  tj-data:
+    image: ghcr.io/joanna0001/tj-data:latest
+    container_name: tj-data
+    ports:
+      - "8093:8093"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 学习服务
+  tj-learning:
+    image: ghcr.io/joanna0001/tj-learning:latest
+    container_name: tj-learning
+    ports:
+      - "8090:8090"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 媒体服务
+  tj-media:
+    image: ghcr.io/joanna0001/tj-media:latest
+    container_name: tj-media
+    ports:
+      - "8084:8084"
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 消息服务
+  tj-message-service:
+    image: ghcr.io/joanna0001/tj-message-service:latest
+    container_name: tj-message-service
+    ports:
+      - "8085:8085"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 支付服务
+  tj-pay-service:
+    image: ghcr.io/joanna0001/tj-pay-service:latest
+    container_name: tj-pay-service
+    ports:
+      - "8087:8087"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 搜索服务
+  tj-search:
+    image: ghcr.io/joanna0001/tj-search:latest
+    container_name: tj-search
+    ports:
+      - "8083:8083"
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+    restart: always
+    networks:
+      - tjxt-network
+
+  # 交易服务
+  tj-trade:
+    image: ghcr.io/joanna0001/tj-trade:latest
+    container_name: tj-trade
+    ports:
+      - "8088:8088"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    restart: always
+    networks:
+      - tjxt-network
+
+networks:
+  tjxt-network:
+    driver: bridge
+
