@@ -1,4 +1,4 @@
-name: tjxtBackend
+name: tjxtBackend-Optimized
 
 on:
   push:
@@ -6,13 +6,101 @@ on:
       - main
       - dev
   workflow_dispatch:
+    inputs:
+      services:
+        description: '要部署的服务（用逗号分隔，留空则部署全部）'
+        required: false
+        default: ''
 
 env:
   MAVEN_OPTS: -Xmx3072m
   DOCKER_REGISTRY: ghcr.io/joanna0001
 
 jobs:
+  # 检测哪些服务发生了变化
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.filter.outputs.auth }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      user: ${{ steps.filter.outputs.user }}
+      course: ${{ steps.filter.outputs.course }}
+      exam: ${{ steps.filter.outputs.exam }}
+      data: ${{ steps.filter.outputs.data }}
+      learning: ${{ steps.filter.outputs.learning }}
+      media: ${{ steps.filter.outputs.media }}
+      message: ${{ steps.filter.outputs.message }}
+      pay: ${{ steps.filter.outputs.pay }}
+      search: ${{ steps.filter.outputs.search }}
+      trade: ${{ steps.filter.outputs.trade }}
+      common: ${{ steps.filter.outputs.common }}
+      any_service_changed: ${{ steps.check.outputs.any_changed }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'tj-auth/**'
+            gateway:
+              - 'tj-gateway/**'
+            user:
+              - 'tj-user/**'
+            course:
+              - 'tj-course/**'
+            exam:
+              - 'tj-exam/**'
+            data:
+              - 'tj-data/**'
+            learning:
+              - 'tj-learning/**'
+            media:
+              - 'tj-media/**'
+            message:
+              - 'tj-message/**'
+            pay:
+              - 'tj-pay/**'
+            search:
+              - 'tj-search/**'
+            trade:
+              - 'tj-trade/**'
+            common:
+              - 'tj-common/**'
+              - 'tj-api/**'
+              - 'pom.xml'
+      
+      - name: Check if any service changed
+        id: check
+        run: |
+          if [ "${{ steps.filter.outputs.auth }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.gateway }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.user }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.course }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.exam }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.data }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.learning }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.media }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.message }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.pay }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.search }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.trade }}" == "true" ] || \
+             [ "${{ steps.filter.outputs.common }}" == "true" ]; then
+            echo "any_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "any_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  # 构建所有发生变化的模块
   build:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.any_service_changed == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     
     steps:
@@ -48,86 +136,403 @@ jobs:
             tj-trade/target/*.jar
           retention-days: 1
 
-  docker-build-push:
-    needs: build
+  # 构建和推送 Docker 镜像 - Auth Service
+  build-auth:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.auth == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: 
-          - name: tj-auth-service
-            path: tj-auth/tj-auth-service
-          - name: tj-gateway
-            path: tj-gateway
-          - name: tj-user
-            path: tj-user
-          - name: tj-course
-            path: tj-course
-          - name: tj-exam
-            path: tj-exam
-          - name: tj-data
-            path: tj-data
-          - name: tj-learning
-            path: tj-learning
-          - name: tj-media
-            path: tj-media
-          - name: tj-message-service
-            path: tj-message/tj-message-service
-          - name: tj-pay-service
-            path: tj-pay/tj-pay-service
-          - name: tj-search
-            path: tj-search
-          - name: tj-trade
-            path: tj-trade
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: jar-files
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
-      - name: Prepare Docker context
+      - name: Prepare and Build
         run: |
           mkdir -p docker-context
           cp Dockerfile docker-context/
-          cp ${{ matrix.service.path }}/target/*.jar docker-context/app.jar
-      
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+          cp tj-auth/tj-auth-service/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
         with:
           context: ./docker-context
           file: ./docker-context/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ matrix.service.name }}:${{ github.sha }}
-            ${{ env.DOCKER_REGISTRY }}/${{ matrix.service.name }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+            ${{ env.DOCKER_REGISTRY }}/tj-auth-service:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-auth-service:latest
 
+  # Gateway Service
+  build-gateway:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.gateway == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-gateway/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-gateway:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-gateway:latest
+
+  # User Service
+  build-user:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.user == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-user/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-user:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-user:latest
+
+  # Course Service
+  build-course:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.course == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-course/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-course:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-course:latest
+
+  # Exam Service
+  build-exam:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.exam == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-exam/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-exam:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-exam:latest
+
+  # Data Service
+  build-data:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.data == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-data/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-data:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-data:latest
+
+  # Learning Service
+  build-learning:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.learning == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-learning/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-learning:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-learning:latest
+
+  # Media Service
+  build-media:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.media == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-media/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-media:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-media:latest
+
+  # Message Service
+  build-message:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.message == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-message/tj-message-service/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-message-service:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-message-service:latest
+
+  # Pay Service
+  build-pay:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.pay == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-pay/tj-pay-service/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-pay-service:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-pay-service:latest
+
+  # Search Service
+  build-search:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.search == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-search/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-search:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-search:latest
+
+  # Trade Service
+  build-trade:
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.trade == 'true' || needs.detect-changes.outputs.common == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare and Build
+        run: |
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp tj-trade/target/*.jar docker-context/app.jar
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./docker-context
+          file: ./docker-context/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/tj-trade:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/tj-trade:latest
+
+  # 部署到服务器
   deploy:
-    needs: docker-build-push
+    needs: [detect-changes, build-auth, build-gateway, build-user, build-course, build-exam, build-data, build-learning, build-media, build-message, build-pay, build-search, build-trade]
+    if: |
+      always() && 
+      needs.build.result == 'success' &&
+      (needs.detect-changes.outputs.any_service_changed == 'true' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
+        env:
+          AUTH_CHANGED: ${{ needs.detect-changes.outputs.auth }}
+          GATEWAY_CHANGED: ${{ needs.detect-changes.outputs.gateway }}
+          USER_CHANGED: ${{ needs.detect-changes.outputs.user }}
+          COURSE_CHANGED: ${{ needs.detect-changes.outputs.course }}
+          EXAM_CHANGED: ${{ needs.detect-changes.outputs.exam }}
+          DATA_CHANGED: ${{ needs.detect-changes.outputs.data }}
+          LEARNING_CHANGED: ${{ needs.detect-changes.outputs.learning }}
+          MEDIA_CHANGED: ${{ needs.detect-changes.outputs.media }}
+          MESSAGE_CHANGED: ${{ needs.detect-changes.outputs.message }}
+          PAY_CHANGED: ${{ needs.detect-changes.outputs.pay }}
+          SEARCH_CHANGED: ${{ needs.detect-changes.outputs.search }}
+          TRADE_CHANGED: ${{ needs.detect-changes.outputs.trade }}
+          COMMON_CHANGED: ${{ needs.detect-changes.outputs.common }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: 22
+          command_timeout: 30m
+          timeout: 30m
+          envs: AUTH_CHANGED,GATEWAY_CHANGED,USER_CHANGED,COURSE_CHANGED,EXAM_CHANGED,DATA_CHANGED,LEARNING_CHANGED,MEDIA_CHANGED,MESSAGE_CHANGED,PAY_CHANGED,SEARCH_CHANGED,TRADE_CHANGED,COMMON_CHANGED
           script: |
             # 登录 GitHub Container Registry
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ghcr.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
@@ -135,32 +540,82 @@ jobs:
             # 进入部署目录
             cd /opt/project/tjxt
             
-            # 拉取最新镜像
-            docker pull ghcr.io/joanna0001/tj-auth-service:latest
-            docker pull ghcr.io/joanna0001/tj-gateway:latest
-            docker pull ghcr.io/joanna0001/tj-user:latest
-            docker pull ghcr.io/joanna0001/tj-course:latest
-            docker pull ghcr.io/joanna0001/tj-exam:latest
-            docker pull ghcr.io/joanna0001/tj-data:latest
-            docker pull ghcr.io/joanna0001/tj-learning:latest
-            docker pull ghcr.io/joanna0001/tj-media:latest
-            docker pull ghcr.io/joanna0001/tj-message-service:latest
-            docker pull ghcr.io/joanna0001/tj-pay-service:latest
-            docker pull ghcr.io/joanna0001/tj-search:latest
-            docker pull ghcr.io/joanna0001/tj-trade:latest
+            # 定义要更新的服务列表
+            SERVICES_TO_UPDATE=""
             
-            # 停止并删除旧容器
-            docker-compose down
+            # 如果 common 模块变化了，更新所有服务
+            if [ "$COMMON_CHANGED" == "true" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+              echo "Common modules changed or manual trigger, updating all services..."
+              SERVICES_TO_UPDATE="tj-auth-service tj-gateway tj-user tj-course tj-exam tj-data tj-learning tj-media tj-message-service tj-pay-service tj-search tj-trade"
+            else
+              # 根据变化的服务添加到更新列表
+              [ "$AUTH_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-auth-service"
+              [ "$GATEWAY_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-gateway"
+              [ "$USER_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-user"
+              [ "$COURSE_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-course"
+              [ "$EXAM_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-exam"
+              [ "$DATA_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-data"
+              [ "$LEARNING_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-learning"
+              [ "$MEDIA_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-media"
+              [ "$MESSAGE_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-message-service"
+              [ "$PAY_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-pay-service"
+              [ "$SEARCH_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-search"
+              [ "$TRADE_CHANGED" == "true" ] && SERVICES_TO_UPDATE="$SERVICES_TO_UPDATE tj-trade"
+            fi
             
-            # 启动新容器
-            docker-compose up -d
+            echo "Services to update: $SERVICES_TO_UPDATE"
+            
+            # 拉取更新的镜像
+            if [ -n "$SERVICES_TO_UPDATE" ]; then
+              for service in $SERVICES_TO_UPDATE; do
+                echo "========================================="
+                echo "Pulling image for $service..."
+                echo "========================================="
+                if docker pull ghcr.io/joanna0001/$service:latest; then
+                  echo "✓ Successfully pulled $service"
+                else
+                  echo "✗ Failed to pull $service, continuing..."
+                fi
+              done
+              
+              # 使用 docker-compose 重启更新的服务
+              echo "========================================="
+              echo "Restarting services: $SERVICES_TO_UPDATE"
+              echo "========================================="
+              docker-compose up -d --no-deps $SERVICES_TO_UPDATE
+              
+              echo "========================================="
+              echo "Checking service status..."
+              echo "========================================="
+              docker-compose ps
+            else
+              echo "No services to update"
+            fi
             
             # 清理未使用的镜像
+            echo "Cleaning up unused images..."
             docker image prune -f
+            
+            echo "========================================="
+            echo "Deployment completed successfully!"
+            echo "========================================="
       
       - name: Deployment notification
         if: always()
         run: |
           echo "Deployment status: ${{ job.status }}"
           echo "Deployed commit: ${{ github.sha }}"
-          echo "Services deployed: tj-auth-service, tj-gateway, tj-user, tj-course, tj-exam, tj-data, tj-learning, tj-media, tj-message-service, tj-pay-service, tj-search, tj-trade"
+          echo "Auth changed: ${{ needs.detect-changes.outputs.auth }}"
+          echo "Gateway changed: ${{ needs.detect-changes.outputs.gateway }}"
+          echo "User changed: ${{ needs.detect-changes.outputs.user }}"
+          echo "Course changed: ${{ needs.detect-changes.outputs.course }}"
+          echo "Exam changed: ${{ needs.detect-changes.outputs.exam }}"
+          echo "Data changed: ${{ needs.detect-changes.outputs.data }}"
+          echo "Learning changed: ${{ needs.detect-changes.outputs.learning }}"
+          echo "Media changed: ${{ needs.detect-changes.outputs.media }}"
+          echo "Message changed: ${{ needs.detect-changes.outputs.message }}"
+          echo "Pay changed: ${{ needs.detect-changes.outputs.pay }}"
+          echo "Search changed: ${{ needs.detect-changes.outputs.search }}"
+          echo "Trade changed: ${{ needs.detect-changes.outputs.trade }}"
+          echo "Common changed: ${{ needs.detect-changes.outputs.common }}"
+
