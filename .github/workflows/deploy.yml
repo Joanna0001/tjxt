@@ -14,7 +14,7 @@ on:
 
 env:
   MAVEN_OPTS: -Xmx3072m
-  DOCKER_REGISTRY: registry.cn-hangzhou.aliyuncs.com/tjxt_backend
+  DOCKER_REGISTRY: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend
 
 jobs:
   # 检测哪些服务发生了变化
@@ -149,7 +149,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -179,7 +179,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -209,7 +209,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -239,7 +239,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -269,7 +269,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -299,7 +299,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -329,7 +329,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -359,7 +359,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -389,7 +389,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -419,7 +419,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -449,7 +449,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -479,7 +479,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
+          registry: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com
           username: ${{ secrets.ALIYUN_USERNAME }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
       - name: Prepare and Build
@@ -535,7 +535,7 @@ jobs:
           envs: AUTH_CHANGED,GATEWAY_CHANGED,USER_CHANGED,COURSE_CHANGED,EXAM_CHANGED,DATA_CHANGED,LEARNING_CHANGED,MEDIA_CHANGED,MESSAGE_CHANGED,PAY_CHANGED,SEARCH_CHANGED,TRADE_CHANGED,COMMON_CHANGED
           script: |
             # 登录阿里云容器镜像服务
-            echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login registry.cn-hangzhou.aliyuncs.com -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
+            echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
             
             # 进入部署目录
             cd /opt/project/tjxt
@@ -571,7 +571,7 @@ jobs:
                 echo "========================================="
                 echo "Pulling image for $service..."
                 echo "========================================="
-                if docker pull registry.cn-hangzhou.aliyuncs.com/tjxt_backend/$service:latest; then
+                if docker pull crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/$service:latest; then
                   echo "✓ Successfully pulled $service"
                 else
                   echo "✗ Failed to pull $service, continuing..."

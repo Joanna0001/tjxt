@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # 认证服务
   tj-auth-service:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-auth-service:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-auth-service:latest
     container_name: tj-auth-service
     ports:
       - "8081:8081"
@@ -21,7 +21,7 @@ services:
 
   # 网关服务
   tj-gateway:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-gateway:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-gateway:latest
     container_name: tj-gateway
     ports:
       - "10010:10010"
@@ -41,7 +41,7 @@ services:
 
   # 用户服务
   tj-user:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-user:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-user:latest
     container_name: tj-user
     ports:
       - "8082:8082"
@@ -59,7 +59,7 @@ services:
 
   # 课程服务
   tj-course:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-course:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-course:latest
     container_name: tj-course
     ports:
       - "8086:8086"
@@ -77,7 +77,7 @@ services:
 
   # 考试服务
   tj-exam:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-exam:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-exam:latest
     container_name: tj-exam
     ports:
       - "8089:8089"
@@ -95,7 +95,7 @@ services:
 
   # 数据服务
   tj-data:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-data:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-data:latest
     container_name: tj-data
     ports:
       - "8093:8093"
@@ -113,7 +113,7 @@ services:
 
   # 学习服务
   tj-learning:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-learning:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-learning:latest
     container_name: tj-learning
     ports:
       - "8090:8090"
@@ -131,7 +131,7 @@ services:
 
   # 媒体服务
   tj-media:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-media:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-media:latest
     container_name: tj-media
     ports:
       - "8084:8084"
@@ -149,7 +149,7 @@ services:
 
   # 消息服务
   tj-message-service:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-message-service:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-message-service:latest
     container_name: tj-message-service
     ports:
       - "8085:8085"
@@ -167,7 +167,7 @@ services:
 
   # 支付服务
   tj-pay-service:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-pay-service:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-pay-service:latest
     container_name: tj-pay-service
     ports:
       - "8087:8087"
@@ -185,7 +185,7 @@ services:
 
   # 搜索服务
   tj-search:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-search:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-search:latest
     container_name: tj-search
     ports:
       - "8083:8083"
@@ -203,7 +203,7 @@ services:
 
   # 交易服务
   tj-trade:
-    image: registry.cn-hangzhou.aliyuncs.com/tjxt_backend/tj-trade:latest
+    image: crpi-mh893kx20tmiit78.cn-hangzhou.personal.cr.aliyuncs.com/tjxt_backend/tj-trade:latest
     container_name: tj-trade
     ports:
       - "8088:8088"
