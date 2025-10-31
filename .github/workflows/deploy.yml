@@ -498,11 +498,11 @@ jobs:
 
   # 部署到服务器
   deploy:
-    needs: [detect-changes, build-auth, build-gateway, build-user, build-course, build-exam, build-data, build-learning, build-media, build-message, build-pay, build-search, build-trade]
+    needs: [build, detect-changes, build-auth, build-gateway, build-user, build-course, build-exam, build-data, build-learning, build-media, build-message, build-pay, build-search, build-trade]
     if: |
-      always() && 
-      needs.build.result == 'success' &&
-      (needs.detect-changes.outputs.any_service_changed == 'true' || github.event_name == 'workflow_dispatch')
+      always() &&
+      (needs.build.result == 'success' || needs.build.result == 'skipped') &&
+      (needs.detect-changes.outputs.any_service_changed == 'true' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.common == 'true')
     runs-on: ubuntu-latest
     
     steps:
@@ -582,12 +582,12 @@ jobs:
               echo "========================================="
               echo "Restarting services: $SERVICES_TO_UPDATE"
               echo "========================================="
-              docker-compose up -d --no-deps $SERVICES_TO_UPDATE
+              docker compose up -d --no-deps $SERVICES_TO_UPDATE
               
               echo "========================================="
               echo "Checking service status..."
               echo "========================================="
-              docker-compose ps
+              docker compose ps
             else
               echo "No services to update"
             fi
