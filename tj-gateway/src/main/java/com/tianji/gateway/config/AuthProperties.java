@@ -18,10 +18,10 @@ public class AuthProperties implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         // 添加默认不拦截的路径
-        excludePath.add("/error/**");
-        excludePath.add("/jwks");
-        excludePath.add("/accounts/login");
-        excludePath.add("/accounts/admin/login");
-        excludePath.add("/accounts/refresh");
+        excludePath.add("POST:/error/**");
+        excludePath.add("GET:/jwks");
+        excludePath.add("POST:/as/accounts/login");
+        excludePath.add("POST:/as/accounts/admin/login");
+        excludePath.add("GET:/as/accounts/refresh");
     }
 }

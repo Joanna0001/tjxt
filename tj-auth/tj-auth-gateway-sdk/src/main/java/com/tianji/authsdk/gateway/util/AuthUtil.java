@@ -86,6 +86,9 @@ public class AuthUtil {
             // token格式有误
             return R.error(INVALID_TOKEN_CODE, INVALID_TOKEN_PAYLOAD);
         }
+        if (userDTO == null || userDTO.getUserId() == null) {
+            return R.error(INVALID_TOKEN_CODE, INVALID_TOKEN_PAYLOAD);
+        }
 
         // 6.返回
         return R.ok(userDTO);

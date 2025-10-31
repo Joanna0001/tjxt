@@ -2,8 +2,6 @@ spring:
   cloud:
     nacos:
       server-addr: 117.72.198.60:8848 # nacos注册中心
-      config:
-        namespace: 830ebeac-0e0b-45bf-bea3-1ea3d02827c4
       discovery:
         namespace: 830ebeac-0e0b-45bf-bea3-1ea3d02827c4
         group: DEFAULT_GROUP
