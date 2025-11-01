@@ -88,7 +88,7 @@
       "name": "tj.mq.host",
       "type": "java.lang.String",
       "description": "rabbitmq的地址",
-      "defaultValue": "117.72.198.60"
+      "defaultValue": "61.153.188.157"
     },
     {
       "name": "tj.mq.port",
@@ -154,7 +154,7 @@
       "name": "tj.redis.host",
       "type": "java.lang.String",
       "description": "redis的地址",
-      "defaultValue": "117.72.198.60"
+      "defaultValue": "61.153.188.157"
     },
     {
       "name": "tj.redis.password",
@@ -190,7 +190,7 @@
       "name": "tj.jdbc.host",
       "type": "java.lang.String",
       "description": "数据库地址",
-      "defaultValue": "117.72.198.60"
+      "defaultValue": "61.153.188.157"
     },
     {
       "name": "tj.jdbc.port",
