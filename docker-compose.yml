@@ -6,13 +6,13 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -24,13 +24,13 @@ services:
     ports:
       - "10010:10010"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -44,13 +44,13 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -62,13 +62,13 @@ services:
     ports:
       - "8086:8086"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -80,13 +80,13 @@ services:
     ports:
       - "8089:8089"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -98,13 +98,13 @@ services:
     ports:
       - "8093:8093"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -116,13 +116,13 @@ services:
     ports:
       - "8090:8090"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -134,13 +134,13 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -152,13 +152,13 @@ services:
     ports:
       - "8085:8085"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -170,13 +170,13 @@ services:
     ports:
       - "8087:8087"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -188,13 +188,13 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
@@ -206,13 +206,13 @@ services:
     ports:
       - "8088:8088"
     environment:
-      - JAVA_OPTS=-Xms150m -Xmx300m
+      - JAVA_OPTS=-Xms192m -Xmx384m
     deploy:
       resources:
         limits:
-          memory: 350M
+          memory: 448M
         reservations:
-          memory: 256M
+          memory: 320M
     restart: always
     networks:
       - tjxt-network
