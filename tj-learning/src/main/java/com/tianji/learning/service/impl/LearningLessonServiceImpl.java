@@ -1,10 +1,17 @@
 package com.tianji.learning.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tianji.api.client.course.CourseClient;
 import com.tianji.api.dto.course.CourseSimpleInfoDTO;
+import com.tianji.common.domain.dto.PageDTO;
+import com.tianji.common.domain.query.PageQuery;
+import com.tianji.common.exceptions.BadRequestException;
+import com.tianji.common.utils.BeanUtils;
 import com.tianji.common.utils.CollUtils;
+import com.tianji.common.utils.UserContext;
 import com.tianji.learning.domain.po.LearningLesson;
+import com.tianji.learning.domain.vo.LearningLessonVO;
 import com.tianji.learning.mapper.LearningLessonMapper;
 import com.tianji.learning.service.ILearningLessonService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,5 +60,45 @@ public class LearningLessonServiceImpl extends ServiceImpl<LearningLessonMapper,
         }
         // 批量新增
         saveBatch(list);
+    }
+
+    @Override
+    public PageDTO<LearningLessonVO> queryMyLessons(PageQuery query) {
+        Long userId = UserContext.getUser();
+
+        Page<LearningLesson> page = lambdaQuery()
+                .eq(LearningLesson::getUserId, userId)
+                .page(query.toMpPage("latest_learn_time", false));
+
+        List<LearningLesson> records = page.getRecords();
+        if(CollUtils.isNotEmpty(records)) {
+            return PageDTO.empty(page);
+        }
+
+        // 查询课程信息
+        // 获取课程id
+        Set<Long> cIds = records.stream().map(LearningLesson::getCourseId).collect(Collectors.toSet());
+        // 查询课程信息
+        List<CourseSimpleInfoDTO> cInfoList = courseClient.getSimpleInfoList(cIds);
+        if(CollUtils.isEmpty(cInfoList)) {
+            throw new BadRequestException("课程信息不存在！");
+        }
+        // 把课程集合处理成Map, key是courseId, 值是course本身
+        Map<Long, CourseSimpleInfoDTO> cMap = cInfoList.stream().
+                collect(Collectors.toMap(CourseSimpleInfoDTO::getId, c -> c));
+
+        // 封装VO返回
+        List<LearningLessonVO> list = new ArrayList<>(cInfoList.size());
+        for(LearningLesson r : records) {
+            // 拷贝基础属性到vo
+            LearningLessonVO vo = BeanUtils.copyBean(r, LearningLessonVO.class);
+            // 获取课程信息，填充到vo
+            CourseSimpleInfoDTO cInfo = cMap.get(r.getCourseId());
+            vo.setCourseName(cInfo.getName());
+            vo.setCourseCoverUrl(cInfo.getCoverUrl());
+            vo.setSections(cInfo.getSectionNum());
+            list.add(vo);
+        }
+        return PageDTO.of(page, list);
     }
 }
