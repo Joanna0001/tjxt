@@ -1,5 +1,6 @@
 package com.tianji.learning.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tianji.api.client.course.CourseClient;
@@ -100,5 +101,18 @@ public class LearningLessonServiceImpl extends ServiceImpl<LearningLessonMapper,
             list.add(vo);
         }
         return PageDTO.of(page, list);
+    }
+
+    @Override
+    public LearningLesson queryLessonByCourseId(Long courseId) {
+        if(courseId == null) {
+            log.error("<UNK>");
+            throw new IllegalArgumentException("课程id不能为空");
+        }
+
+        LambdaQueryWrapper<LearningLesson> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LearningLesson::getCourseId, courseId);
+
+        return getOne(queryWrapper);
     }
 }
