@@ -2,9 +2,12 @@ spring:
   cloud:
     nacos:
       server-addr: 61.153.188.157:8848 # nacos注册中心
-      username: nacos  # nacos用户名
-      password: nacos  # nacos密码
+      username: nacos
+      password: nacos
       discovery:
+        namespace: 8ebcab0e-f4c2-4630-a62d-5ec66343fc21
+        group: DEFAULT_GROUP
+      config:
         namespace: 8ebcab0e-f4c2-4630-a62d-5ec66343fc21
         group: DEFAULT_GROUP
 logging:

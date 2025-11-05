@@ -7,7 +7,9 @@ spring:
       discovery:
         namespace: 8ebcab0e-f4c2-4630-a62d-5ec66343fc21
         group: DEFAULT_GROUP
-        # ip: 61.153.188.157
+      config:
+        namespace: 8ebcab0e-f4c2-4630-a62d-5ec66343fc21
+        group: DEFAULT_GROUP
   elasticsearch:
     uris: http://14.103.164.47:9200
 logging:
