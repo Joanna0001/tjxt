@@ -10,6 +10,7 @@ spring:
       config:
         namespace: 8ebcab0e-f4c2-4630-a62d-5ec66343fc21
         group: DEFAULT_GROUP
+        
 logging:
   level:
     com.tianji: debug

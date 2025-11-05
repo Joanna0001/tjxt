@@ -53,7 +53,7 @@ public class CourseInfoController {
      * @return 小节对应的mediaId和课程id
      */
     @GetMapping("/section/{id}")
-    @ApiImplicitParam(name = "id", value = "小节id，不支持章id或者练习id查询")
+    @ApiImplicitParam(name = "id", value = "小节id，不支持章id或者练习id查询", dataTypeClass = Long.class, paramType = "path", required = true)
     public SectionInfoDTO sectionInfo(@PathVariable("id") Long sectionId) {
         return courseCatalogueService.getSimpleSectionInfo(sectionId);
     }
@@ -78,9 +78,9 @@ public class CourseInfoController {
     @GetMapping("/{id}")
     @ApiOperation("获取课程信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "获取课程信息"),
-            @ApiImplicitParam(name = "withCatalogue", value = "是否要查询目录信息"),
-            @ApiImplicitParam(name = "withTeachers", value = "是否查询课程老师信息")
+            @ApiImplicitParam(name = "id", value = "获取课程信息", dataTypeClass = Long.class, paramType = "path", required = true),
+            @ApiImplicitParam(name = "withCatalogue", value = "是否要查询目录信息", dataTypeClass = Boolean.class, paramType = "query"),
+            @ApiImplicitParam(name = "withTeachers", value = "是否查询课程老师信息", dataTypeClass = Boolean.class, paramType = "query")
     })
     public CourseFullInfoDTO getById(
             @PathVariable("id") Long id,

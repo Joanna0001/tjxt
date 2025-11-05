@@ -48,7 +48,7 @@ public class CategoryController {
     @GetMapping("{id}")
     @ApiOperation("获取课程分类信息")
     @ApiImplicitParams(
-            @ApiImplicitParam(name = "id", value = "分类id")
+            @ApiImplicitParam(name = "id", value = "分类id", dataTypeClass = Long.class, paramType = "path", required = true)
     )
     public CategoryInfoVO get(@PathVariable("id") Long id) {
         return categoryService.get(id);
@@ -64,7 +64,7 @@ public class CategoryController {
     @DeleteMapping("{id}")
     @ApiOperation("删除分类信息")
     @ApiImplicitParams(
-            @ApiImplicitParam(name = "id", value = "分类id")
+            @ApiImplicitParam(name = "id", value = "分类id", dataTypeClass = Long.class, paramType = "path", required = true)
     )
     public void delete(@PathVariable("id") Long id) {
         categoryService.delete(id);

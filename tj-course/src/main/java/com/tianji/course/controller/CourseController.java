@@ -60,8 +60,8 @@ public class CourseController {
 
     @GetMapping("baseInfo/{id}")
     @ApiOperation("获取课程基础信息")
-    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "课程id"),
-            @ApiImplicitParam(name = "see", value = "是否是用于查看页面查看数据，默认是查看,如果不是界面查看数据就是编辑页面使用")})
+    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path", required = true),
+            @ApiImplicitParam(name = "see", value = "是否是用于查看页面查看数据，默认是查看,如果不是界面查看数据就是编辑页面使用", dataTypeClass = Boolean.class, paramType = "query")})
     public CourseBaseInfoVO baseInfo(@PathVariable("id") Long id,
                                      @RequestParam(value = "see", required = false, defaultValue = "1") Boolean see) {
         return courseDraftService.getCourseBaseInfo(id, see);
@@ -78,8 +78,9 @@ public class CourseController {
     @GetMapping("catas/{id}")
     @ApiOperation("获取课程的章节")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "课程id"),
-            @ApiImplicitParam(name = "see", value = "是否是用于查看页面查看数据，默认是查看,如果不是界面查看数据就是编辑页面使用")
+            @ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path"),
+            @ApiImplicitParam(name = "see", value = "是否是用于查看页面查看数据，默认是查看,如果不是界面查看数据就是编辑页面使用", dataTypeClass = Boolean.class, paramType = "query"),
+            @ApiImplicitParam(name = "withPractice", value = "是否查询练习信息", dataTypeClass = Boolean.class, paramType = "query")
     })
     public List<CataVO> catas(@PathVariable(value = "id", required = false) Long id,
                               @RequestParam(value = "see", required = false, defaultValue = "1") Boolean see,
@@ -90,8 +91,8 @@ public class CourseController {
     @PostMapping("catas/save/{id}/{step}")
     @ApiOperation("保存章节")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "课程id"),
-            @ApiImplicitParam(name = "step", value = "步骤")
+            @ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path", required = true),
+            @ApiImplicitParam(name = "step", value = "步骤", dataTypeClass = Integer.class, paramType = "path", required = true)
     })
     @ParamChecker
     public void catasSave(@RequestBody @Validated List<CataSaveDTO> cataSaveDTOS,
@@ -102,7 +103,7 @@ public class CourseController {
     @PostMapping("media/save/{id}")
     @ApiOperation("课程视频")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "课程id")
+            @ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path", required = true)
     })
     public void mediaSave(@PathVariable("id") Long id, @RequestBody @Valid List<CourseMediaDTO> courseMediaDTOS) {
         courseCatalogueDraftService.saveMediaInfo(id, courseMediaDTOS);
@@ -111,7 +112,7 @@ public class CourseController {
     @PostMapping("subjects/save/{id}")
     @ApiOperation("保存小节或练习中的题目")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "课程id")
+            @ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path", required = true)
     })
     public void saveSuject(@PathVariable("id") Long id, @RequestBody @Validated List<CataSubjectDTO> cataSubjectDTO) {
         courseCatalogueDraftService.saveSuject(id, cataSubjectDTO);
@@ -120,7 +121,7 @@ public class CourseController {
     @GetMapping("subjects/get/{id}")
     @ApiOperation("获取小节或练习中的题目（用于编辑）")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "课程id")
+            @ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path", required = true)
     })
     public List<CataSimpleSubjectVO> getSuject(@PathVariable("id") Long id) {
         return courseCatalogueDraftService.getSuject(id);
@@ -129,8 +130,8 @@ public class CourseController {
     @GetMapping("teachers/{id}")
     @ApiOperation("查询课程相关的老师信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "课程id"),
-            @ApiImplicitParam(name = "see", value = "是否是用于查看页面查看数据，默认是查看,如果不是界面查看数据就是编辑页面使用")
+            @ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path", required = true),
+            @ApiImplicitParam(name = "see", value = "是否是用于查看页面查看数据，默认是查看,如果不是界面查看数据就是编辑页面使用", dataTypeClass = Boolean.class, paramType = "query")
     })
     public List<CourseTeacherVO> teacher(@PathVariable("id") Long id,
                                          @RequestParam(value = "see", required = false, defaultValue = "1") Boolean see) {
@@ -170,7 +171,7 @@ public class CourseController {
     @DeleteMapping("delete/{id}")
     @ApiOperation("课程删除")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id")
+            @ApiImplicitParam(name = "id", value = "id", dataTypeClass = Long.class, paramType = "path", required = true)
     })
     public void deleteById(@PathVariable("id") Long id) {
         courseService.delete(id);
@@ -185,7 +186,7 @@ public class CourseController {
     @ApiOperation("根据课程id，查询所有章节的序号")
     @GetMapping("/catas/index/list/{id}")
     @ApiImplicitParams(
-            @ApiImplicitParam(name = "id", value = "课程id")
+            @ApiImplicitParam(name = "id", value = "课程id", dataTypeClass = Long.class, paramType = "path", required = true)
     )
     public List<CataSimpleInfoVO> catasIndexList(@PathVariable("id") Long id) {
         return courseCatalogueService.getCatasIndexList(id);
@@ -213,8 +214,8 @@ public class CourseController {
     @ApiOperation("校验课程名称是否已经存在")
     @GetMapping("/checkName")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id"),
-            @ApiImplicitParam(name = "name", value = "课程名称")
+            @ApiImplicitParam(name = "id", value = "id", dataTypeClass = Long.class, paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "课程名称", dataTypeClass = String.class, paramType = "query", required = true)
     })
     public NameExistVO checkNameExist(@RequestParam(value = "id",required = false) Long id,
                                       @RequestParam(value = "name") String name){
