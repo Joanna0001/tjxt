@@ -2,15 +2,20 @@ spring:
   cloud:
     nacos:
       server-addr: 61.153.188.157:8848 # nacos注册中心
-      config:
-        namespace: 4594e899-2434-408f-aec9-e5b5ae5ec219
-        group: DEFAULT_GROUP
+      username: nacos  # nacos用户名
+      password: nacos  # nacos密码
       discovery:
         namespace: 4594e899-2434-408f-aec9-e5b5ae5ec219
         group: DEFAULT_GROUP
-        
+      config:
+        namespace: 4594e899-2434-408f-aec9-e5b5ae5ec219
+        group: DEFAULT_GROUP
+    alibaba:
+      seata:
+        tx-service-group: search-service-group # seata事务组，命名规则：spring.application.name + "-group"
   elasticsearch:
     uris: http://14.103.164.47:9200
+
 logging:
   level:
     com.tianji: debug
