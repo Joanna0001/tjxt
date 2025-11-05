@@ -5,8 +5,6 @@ server:
   error:
     include-message: always #返回的响应体带上message
 spring:
-  profiles:
-    active: dev
   application:
     name: pay-service
   cloud:

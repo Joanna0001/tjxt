@@ -3,8 +3,6 @@ server:
   tomcat:
     uri-encoding: UTF-8   #服务编码
 spring:
-  profiles:
-    active: dev  # 本地开发使用 local，Docker 部署时改为 dev
   application:
     name: auth-service
   cloud:

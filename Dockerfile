@@ -1,6 +1,8 @@
 FROM eclipse-temurin:11-jre
 LABEL maintainer="研究院研发组 <research-maint@itcast.cn>"
 ENV JAVA_OPTS=""
+# 设定 Spring Profile
+ENV SPRING_PROFILES_ACTIVE=dev
 # 设定时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
