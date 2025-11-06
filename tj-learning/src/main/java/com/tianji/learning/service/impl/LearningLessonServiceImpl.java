@@ -117,6 +117,7 @@ public class LearningLessonServiceImpl extends ServiceImpl<LearningLessonMapper,
         }
 
         LambdaQueryWrapper<LearningLesson> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LearningLesson::getUserId, UserContext.getUser());
         queryWrapper.eq(LearningLesson::getCourseId, courseId);
 
         return getOne(queryWrapper);
@@ -155,5 +156,12 @@ public class LearningLessonServiceImpl extends ServiceImpl<LearningLessonMapper,
         }
         log.info("查询最近学习的课程: {}", vo);
         return vo;
+    }
+
+    @Override
+    public Integer countLearningLessonByCourse(Long courseId) {
+        return lambdaQuery()
+                .eq(LearningLesson::getCourseId, courseId)
+                .count();
     }
 }

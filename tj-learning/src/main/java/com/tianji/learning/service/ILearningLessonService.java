@@ -16,4 +16,6 @@ public interface ILearningLessonService {
     LearningLesson queryLessonByCourseId(Long courseId);
 
     NowLearningLessonVO queryNowLessons();
+
+    Integer countLearningLessonByCourse(Long courseId);
 }

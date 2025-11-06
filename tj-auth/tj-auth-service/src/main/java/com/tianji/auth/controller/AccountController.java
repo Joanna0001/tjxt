@@ -5,10 +5,12 @@ import com.tianji.api.dto.user.LoginFormDTO;
 import com.tianji.auth.common.constants.JwtConstants;
 import com.tianji.auth.service.IAccountService;
 import com.tianji.common.exceptions.BadRequestException;
+import com.tianji.common.utils.StringUtils;
 import com.tianji.common.utils.WebUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/accounts")
 @Api(tags = "账户管理")
 @RequiredArgsConstructor
+@Slf4j
 public class AccountController {
 
     private final IAccountService accountService;
@@ -46,17 +49,27 @@ public class AccountController {
             @CookieValue(value = JwtConstants.REFRESH_HEADER, required = false) String studentToken,
             @CookieValue(value = JwtConstants.ADMIN_REFRESH_HEADER, required = false) String adminToken
     ) {
-        if (studentToken == null && adminToken == null) {
+        log.info("refreshToken: studentToken={}, adminToken={}", studentToken, adminToken);
+        if (StringUtils.isBlank(studentToken) && StringUtils.isBlank(adminToken)) {
             throw new BadRequestException("登录超时");
         }
-        String host = WebUtils.getHeader("origin");
-        if (host == null) {
-            throw new BadRequestException("登录超时");
+        // 优先使用studentToken
+        if(StringUtils.isNotBlank(studentToken)){
+            try {
+                return accountService.refreshToken(WebUtils.cookieBuilder().decode(studentToken));
+            } catch (Exception e) {
+                log.debug("student refresh token failed", e);
+                // 可能是token过期或无效，尝试 admin-token
+                if(StringUtils.isBlank(adminToken)){
+                    // 没有admin-token，则直接抛出异常
+                    throw e;
+                }
+            }
         }
-        String token = host.startsWith("www", 7) ? studentToken : adminToken;
-        if (token == null) {
-            throw new BadRequestException("登录超时");
+        // student-token 刷新失败，或者 student-token为null，尝试admin-token
+        if (StringUtils.isNotBlank(adminToken)) {
+            return accountService.refreshToken(WebUtils.cookieBuilder().decode(adminToken));
         }
-        return accountService.refreshToken(WebUtils.cookieBuilder().decode(token));
+        throw new BadRequestException("登录超时");
     }
 }
