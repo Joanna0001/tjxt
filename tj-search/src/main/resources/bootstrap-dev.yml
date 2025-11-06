@@ -12,6 +12,7 @@ spring:
         group: DEFAULT_GROUP
   elasticsearch:
     uris: http://14.103.164.47:9200
+    
 logging:
   level:
     com.tianji: debug

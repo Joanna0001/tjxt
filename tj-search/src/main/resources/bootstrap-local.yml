@@ -10,9 +10,6 @@ spring:
       config:
         namespace: 4594e899-2434-408f-aec9-e5b5ae5ec219
         group: DEFAULT_GROUP
-    alibaba:
-      seata:
-        tx-service-group: search-service-group # seata事务组，命名规则：spring.application.name + "-group"
   elasticsearch:
     uris: http://14.103.164.47:9200
 
